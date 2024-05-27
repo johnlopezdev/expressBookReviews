@@ -73,6 +73,20 @@ function putReviewByISBN (payload) {
   })
 }
 
+function deleteReviewByISBN (payload) {
+  return new Promise(async (resolve, reject) => {
+    const {isbn, username} = payload;
+
+    delete books[isbn].reviews[username];
+
+    if (!books[isbn]) {
+      reject(`Unable to find book (ISBN #${isbn})`);
+    } else {
+      resolve(`Deleted review written by: ${username}`);
+    }
+  })
+}
+
 module.exports = {
   getAllBooks,
   getByISBN,
@@ -80,4 +94,5 @@ module.exports = {
   getByTitle,
   getReviewsByISBN,
   putReviewByISBN,
+  deleteReviewByISBN,
 }

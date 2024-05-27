@@ -1,8 +1,7 @@
 const express = require('express');
 const jwt = require('jsonwebtoken');
-let books = require("./booksdb.js");
 const regd_users = express.Router();
-const { putReviewByISBN } = require('./api.js');
+const { putReviewByISBN, deleteReviewByISBN } = require('./api.js');
 
 let users = [];
 
@@ -17,8 +16,6 @@ const authenticatedUser = (username, password) => { //returns boolean
 //only registered users can login
 regd_users.post("/login", (req, res) => {
   const { username, password } = req.body;
-
-  console.log(username, password)
 
   if (!username || !password) {
     return res.status(400).json({ message: "Error logging in" });
@@ -46,11 +43,26 @@ regd_users.put("/auth/review/:isbn", async (req, res) => {
     review,
   }
 
-  console.log({ payload })
-
   try {
     const review = await putReviewByISBN(payload);
     return res.status(200).json({message: "We appreciate your feedback!", review});
+  } catch (error) {
+    return res.status(400).json({message: "Failed to add review", error});
+  }
+});
+
+regd_users.delete("/auth/review/:isbn", async (req, res) => {
+  const {isbn} = req.params;
+  const username = req.session.authorization.username;
+
+  const payload = {
+    isbn,
+    username,
+  }
+
+  try {
+    const review = await deleteReviewByISBN(payload);
+    return res.status(200).json({message: "We hope you liked the book", review});
   } catch (error) {
     return res.status(400).json({message: "Failed to add review", error});
   }
